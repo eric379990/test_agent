@@ -8,7 +8,6 @@ import com.beust.jcommander.Parameters;
 @Parameters(separators = "= ")
 public class TestAgentStarterParam {
 
-
-
+    public String command = "start";
 
 }

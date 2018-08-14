@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import ch.qos.logback.core.Context;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import static org.apache.commons.lang.StringUtils.trimToEmpty;
+import static org.ngrinder.common.util.Preconditions.checkNotNull;
 import static com.csc.test_agent.util.Preconditions.checkNotNull;
 import static com.csc.test_agent.util.NetworkUtils.DEFAULT_LOCAL_HOST_ADDRESS;
 
@@ -99,6 +102,42 @@ public class TestAgentConfig implements TestAgentConstants {
         } catch (JoranException e) {
             LOGGER.error("Error while configuring logger", e);
         }
+    }
+
+    /**
+     * Get the agent pid in the form of string.
+     *
+     * @return pid
+     */
+    public String getAgentPidProperties() {
+        checkNotNull(home);
+        Properties properties = home.getProperties("pid");
+        return (String) properties.get("agent.pid");
+    }
+
+    /**
+     * Update agent pid file.
+     *
+     */
+    public void updateAgentPidProperties() {
+        checkNotNull(home);
+        Properties properties = home.getProperties("pid");
+        Set<String> names = properties.stringPropertyNames();
+        if (names.size() > 1) {
+            properties.remove("agent.pid");
+            home.saveProperties("pid", properties);
+        } else if (names.contains("agent.pid")) {
+            removeAgentPidProperties();
+        }
+    }
+
+    /**
+     * Remove agent pid properties.
+     */
+    public void removeAgentPidProperties() {
+        checkNotNull(home);
+        File file = home.getFile("pid");
+        FileUtils.deleteQuietly(file);
     }
 
     public TestAgentHome getHome() {
