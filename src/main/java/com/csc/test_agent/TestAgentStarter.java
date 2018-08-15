@@ -1,5 +1,7 @@
 package com.csc.test_agent;
 
+import java.net.URI;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +14,10 @@ import com.csc.test_agent.util.ProcessUtils;
 
 public class TestAgentStarter implements TestAgentConstants {
 
-    private static final int LOG_FREQUENCY = 5;
     private static final Logger LOGGER = LoggerFactory.getLogger("starter");
     private TestAgentConfig testAgentConfig;
-    private Thread thread;
-    public AgentClient agent = null;
+    public static AgentClient agent = null;
+    private short retryCount = 5;
 
     /**
      * Constructor.
@@ -54,38 +55,26 @@ public class TestAgentStarter implements TestAgentConstants {
         LOGGER.info("connecting to controller {}:{}", controllerIP, controllerPort);
 
         try {
-            this.run();
+            while(retryCount > 0) {
+                try {
+                    agent = new AgentClient(new URI("ws://localhost:8887"));
+                    agent.connect();
+                    Thread.sleep(5000);
+                    retryCount--;
+                } catch (InterruptedException e) {
+                    LOGGER.error("Agent is crashed. {}", e.getMessage());
+                }
+
+                if(agent.isOpen()) {
+                    LOGGER.info("Agent is connected to server!");
+                    break;
+                }
+            }
         } catch (Exception e) {
             LOGGER.error("Error while connecting to : {}:{}", controllerIP, controllerPort);
             staticPrintHelpAndExit("Error while starting Agent", e);
         }
 
-    }
-
-    private long count = 0;
-
-    public void run() {
-        thread = new Thread(new Runnable() {
-            public void run() {
-                do {
-                    try {
-                        if (count++ % LOG_FREQUENCY == 0) {
-                            LOGGER.info("The agent controller daemon is started.");
-                        }
-                        agent = new AgentClient(null);
-                    } catch (Exception e) {
-                        LOGGER.info("Agent is crashed. {}", e.getMessage());
-                    }
-
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        LOGGER.error(e.getMessage());
-                    }
-                } while (true);
-            }
-        }, "Agent Controller Thread");
-        thread.start();
     }
 
     public static void main(String[] args) {

@@ -46,10 +46,10 @@ public class AgentClient extends WebSocketClient {
         // if the error is fatal then onClose will be called additionally
     }
 
-    public AgentClient connect( String uri ) throws URISyntaxException {
-        AgentClient c = new AgentClient( new URI( uri ));
-        c.connect();
-        return c;
-    }
+//    public AgentClient connect( String uri ) throws URISyntaxException {
+//        AgentClient c = new AgentClient( new URI( uri ));
+//        c.connect();
+//        return c;
+//    }
 
 }

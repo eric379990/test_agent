@@ -22,7 +22,6 @@ import ch.qos.logback.core.Context;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import static org.apache.commons.lang.StringUtils.trimToEmpty;
-import static org.ngrinder.common.util.Preconditions.checkNotNull;
 import static com.csc.test_agent.util.Preconditions.checkNotNull;
 import static com.csc.test_agent.util.NetworkUtils.DEFAULT_LOCAL_HOST_ADDRESS;
 
